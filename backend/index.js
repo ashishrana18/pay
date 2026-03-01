@@ -3,9 +3,11 @@ import cors from "cors";
 import * as XLSX from "xlsx/xlsx.mjs";
 import { readFileSync } from "fs";
 import { read } from "xlsx/xlsx.mjs";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
-app.use(cors({ origin: "exp://192.168.1.2:8082" }));
+app.use(cors({ origin: `exp://${process.env.IP_ADDRESS}` }));
 
 app.get("/", (req, res) => {
   try {

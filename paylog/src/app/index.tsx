@@ -1,8 +1,9 @@
 import { View, Text, ScrollView } from "react-native";
-import axios from "axios";
+import api from "../utils/api";
 import { useEffect, useState, Fragment, useMemo } from "react";
 import { WeeklyHeatMap } from "@symbiot.dev/react-native-heatmap";
 import { RadarChart } from "@salmonco/react-native-radar-chart";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Post {
   id: number;
@@ -19,7 +20,6 @@ type HeatMapColor = {
 };
 
 export default function Index() {
-  const [posts, setPosts] = useState<Post[]>([]);
   const [transactions, setTransactions] = useState<any>({});
   const mint = {
     empty: "#161b22",
@@ -41,14 +41,8 @@ export default function Index() {
   };
 
   useEffect(() => {
-    axios.get("https://jsonplaceholder.typicode.com/posts").then((response) => {
-      setPosts(response.data);
-    });
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get("http://192.168.1.2:3000") //1+ phone's ip
+    api
+      .get(`/`) //1+ phone's ip
       .then((response) => {
         setTransactions(response.data);
       })
@@ -83,108 +77,110 @@ export default function Index() {
   }, [transactions]);
 
   return (
-    <ScrollView
-      contentContainerStyle={{
-        padding: 10,
-        backgroundColor: "#000",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <Text
-        style={{
-          color: "#fff",
-          fontSize: 24,
-          fontWeight: "bold",
-          alignSelf: "center",
-          marginTop: 10,
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000" }} edges={["top"]}>
+      <ScrollView
+        contentContainerStyle={{
+          padding: 10,
+          backgroundColor: "#000",
+          width: "100%",
+          height: "100%",
         }}
       >
-        payLOG
-      </Text>
-      {/* <HeatMap data={data} xNumber={10} yNumber={7} shape="circle" /> */}
-      <WeeklyHeatMap
-        data={data3}
-        pressable={true}
-        cellText="count"
-        isHeaderVisible={true}
-        isCellTextVisible={true}
-        // scrollable={false}
-        // startDate={new Date("2026-02-18")}
-        // endDate={new Date("2026-03-16")}
-        cellTextFontSize={12}
-        theme={heatmapTheme as any}
-        isSidebarVisible={true}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginTop: 10,
-          alignSelf: "flex-end",
-          paddingRight: 10,
-        }}
-      >
-        <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
-          Less
+        <Text
+          style={{
+            color: "#fff",
+            fontSize: 24,
+            fontWeight: "bold",
+            alignSelf: "flex-start",
+            marginBottom: 30,
+            paddingLeft: 10,
+          }}
+        >
+          Hi Ashish,
         </Text>
-        {Object.values(mint)
-          .slice(0, 5)
-          .map((color, i) => (
-            <View
-              key={i}
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: 2,
-                backgroundColor: color,
-                marginHorizontal: 1.5,
-                borderWidth: 0.5,
-                borderColor: "rgba(255,255,255,0.1)",
-              }}
-            />
+        <WeeklyHeatMap
+          data={data3}
+          pressable={true}
+          cellText="count"
+          isHeaderVisible={true}
+          isCellTextVisible={true}
+          // scrollable={false}
+          // startDate={new Date("2026-02-18")}
+          // endDate={new Date("2026-03-16")}
+          cellTextFontSize={12}
+          theme={heatmapTheme as any}
+          isSidebarVisible={true}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 10,
+            alignSelf: "flex-end",
+            paddingRight: 10,
+          }}
+        >
+          <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
+            Less
+          </Text>
+          {Object.values(mint)
+            .slice(0, 5)
+            .map((color, i) => (
+              <View
+                key={i}
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: 2,
+                  backgroundColor: color,
+                  marginHorizontal: 1.5,
+                  borderWidth: 0.5,
+                  borderColor: "rgba(255,255,255,0.1)",
+                }}
+              />
+            ))}
+          <Text style={{ color: "#8E9196", fontSize: 12, marginLeft: 6 }}>
+            More
+          </Text>
+        </View>
+        <RadarChart
+          data={data}
+          gradientColor={{
+            startColor: "#FF9432",
+            endColor: "#FFF8F1",
+            count: 4,
+          }}
+          stroke={["#FFE8D3", "#FFE8D3", "#FFE8D3", "#FFE8D3", "#ff9532"]}
+          strokeWidth={[0.5, 0.5, 0.5, 0.5, 1]}
+          strokeOpacity={[1, 1, 1, 1, 0.13]}
+          labelColor="#d5d5d5ff"
+          labelDistance={1.25}
+          dataFillColor="#FF9432"
+          dataFillOpacity={0.8}
+          dataStroke="salmon"
+          dataStrokeWidth={2}
+        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 10,
+            alignSelf: "flex-end",
+            paddingRight: 10,
+          }}
+        >
+          {data.map((item, index) => (
+            <View key={index}>
+              <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
+                {item.label}
+              </Text>
+              <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
+                ₹ {item.value.toLocaleString()}
+              </Text>
+            </View>
           ))}
-        <Text style={{ color: "#8E9196", fontSize: 12, marginLeft: 6 }}>
-          More
-        </Text>
-      </View>
-      <RadarChart
-        data={data}
-        gradientColor={{
-          startColor: "#FF9432",
-          endColor: "#FFF8F1",
-          count: 4,
-        }}
-        stroke={["#FFE8D3", "#FFE8D3", "#FFE8D3", "#FFE8D3", "#ff9532"]}
-        strokeWidth={[0.5, 0.5, 0.5, 0.5, 1]}
-        strokeOpacity={[1, 1, 1, 1, 0.13]}
-        labelColor="#d5d5d5ff"
-        labelDistance={1.25}
-        dataFillColor="#FF9432"
-        dataFillOpacity={0.8}
-        dataStroke="salmon"
-        dataStrokeWidth={2}
-      />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginTop: 10,
-          alignSelf: "flex-end",
-          paddingRight: 10,
-        }}
-      >
-        {data.map((item, index) => (
-          <View key={index}>
-            <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
-              {item.label}
-            </Text>
-            <Text style={{ color: "#8E9196", fontSize: 12, marginRight: 6 }}>
-              ₹ {item.value.toLocaleString()}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
